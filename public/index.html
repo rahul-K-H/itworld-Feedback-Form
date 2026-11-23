@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IT Team Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f3f5fb;
+      --bg-accent: radial-gradient(circle at 15% 10%, #dfe7ff 0, transparent 45%),
+                   radial-gradient(circle at 90% 90%, #e4f6f1 0, transparent 40%);
+      --card: #ffffff;
+      --text: #1b2033;
+      --muted: #5f6782;
+      --border: #d9deea;
+      --input-bg: #fafbfe;
+      --primary: #4f5bd5;
+      --primary-hover: #3f4ac0;
+      --primary-soft: rgba(79, 91, 213, 0.12);
+      --star: #f5a524;
+      --error: #d43f4f;
+      --success: #1f9d6b;
+      --radius: 12px;
+      --shadow: 0 20px 50px -20px rgba(30, 40, 90, 0.25);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1220;
+        --bg-accent: radial-gradient(circle at 15% 10%, #1d2350 0, transparent 45%),
+                     radial-gradient(circle at 90% 90%, #12332c 0, transparent 40%);
+        --card: #171b2e;
+        --text: #e8ebf7;
+        --muted: #9aa2c0;
+        --border: #2b3150;
+        --input-bg: #1c2137;
+        --primary: #7b86ff;
+        --primary-hover: #949dff;
+        --primary-soft: rgba(123, 134, 255, 0.16);
+        --error: #ff6b7a;
+        --success: #3ccf91;
+        --shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-accent), var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 16px;
+      line-height: 1.5;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 40px;
+    }
+
+    header { margin-bottom: 24px; }
+    .badge {
+      display: inline-block;
+      font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--primary); background: var(--primary-soft);
+      padding: 4px 10px; border-radius: 999px; margin-bottom: 12px;
+    }
+    h1 { margin: 0 0 6px; font-size: 30px; font-weight: 700; letter-spacing: -0.02em; }
+    header p { margin: 0; color: var(--muted); }
+    .meta { margin-top: 10px !important; font-size: 13px; }
+
+    form { display: grid; gap: 20px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .section { display: grid; gap: 18px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .section h2 { margin: 0; font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+    .section h2 .num {
+      display: inline-grid; place-items: center;
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--primary-soft); color: var(--primary);
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+    .hint { margin: -12px 0 0; font-size: 13px; color: var(--muted); }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    label, legend { font-weight: 600; font-size: 14px; }
+    .req { color: var(--error); margin-left: 2px; }
+    .opt { font-weight: 400; color: var(--muted); }
+
+    input[type="text"], input[type="email"], select, textarea {
+      font: inherit; color: var(--text);
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--primary);
+      box-shadow: 0 0 0 4px var(--primary-soft); background: var(--card);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    select { appearance: none; cursor: pointer;
+      background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position: calc(100% - 20px) 52%, calc(100% - 15px) 52%;
+      background-size: 5px 5px; background-repeat: no-repeat; padding-right: 40px; }
+
+    /* Searchable dropdown */
+    .combo { position: relative; }
+    .combo input { cursor: pointer; padding-right: 40px;
+      background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+                        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+      background-position: calc(100% - 20px) 52%, calc(100% - 15px) 52%;
+      background-size: 5px 5px; background-repeat: no-repeat; }
+    .combo input:focus { cursor: text; }
+    .combo-list { position: absolute; z-index: 30; left: 0; right: 0; top: calc(100% + 4px);
+      margin: 0; padding: 4px; list-style: none; max-height: 260px; overflow-y: auto;
+      background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow); }
+    .combo-list[hidden] { display: none; }
+    .combo-list li { padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 14px;
+      display: flex; justify-content: space-between; gap: 12px; }
+    .combo-list li .sub { color: var(--muted); font-size: 12px; flex-shrink: 0; }
+    .combo-list li.active, .combo-list li:hover { background: var(--primary-soft); }
+    .combo-list li.empty { color: var(--muted); cursor: default; }
+    .combo-list li.empty:hover { background: none; }
+
+    .field.invalid input, .field.invalid select, .field.invalid textarea { border-color: var(--error); }
+    .field.invalid .stars { outline: 1.5px solid var(--error); outline-offset: 4px; border-radius: 8px; }
+    .error-msg { color: var(--error); font-size: 13px; }
+    .ok-msg { color: var(--success); font-size: 13px; }
+
+    fieldset { border: none; padding: 0; margin: 0; min-width: 0; }
+    legend { margin-bottom: 10px; padding: 0; }
+
+    /* Big tappable star rating */
+    .stars { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .stars input { position: absolute; opacity: 0; pointer-events: none; }
+    .stars label {
+      font-size: 34px; line-height: 1; cursor: pointer;
+      color: var(--border); transition: color .1s, transform .1s;
+      padding: 2px; font-weight: 400;
+    }
+    .stars label:hover { transform: scale(1.12); }
+    .stars label.on { color: var(--star); }
+    .stars input:focus-visible + label { outline: 2px solid var(--primary); border-radius: 6px; }
+    .star-text { margin-left: 8px; font-size: 14px; font-weight: 600; color: var(--muted); }
+
+    /* Compact rating rows */
+    .ratings { display: grid; gap: 10px; }
+    .rating-row {
+      display: grid; grid-template-columns: 1fr 190px; align-items: center; gap: 12px;
+      padding: 10px 14px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--input-bg);
+    }
+    .rating-row label { font-weight: 500; }
+    .rating-row select { padding: 8px 36px 8px 12px; background-color: var(--card); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip input { position: absolute; opacity: 0; pointer-events: none; }
+    .chip span {
+      display: inline-block; padding: 9px 14px;
+      border: 1.5px solid var(--border); border-radius: 999px;
+      font-size: 14px; font-weight: 500; cursor: pointer; user-select: none;
+      transition: all .15s; background: var(--input-bg);
+    }
+    .chip span:hover { border-color: var(--primary); }
+    .chip input:checked + span { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .chip input:focus-visible + span { box-shadow: 0 0 0 4px var(--primary-soft); }
+
+    .counter { font-size: 12px; color: var(--muted); text-align: right; }
+
+    button {
+      font: inherit; font-weight: 600; color: #fff;
+      background: var(--primary); border: none; border-radius: var(--radius);
+      padding: 15px 20px; cursor: pointer;
+      transition: background .15s, transform .05s;
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    button:hover { background: var(--primary-hover); }
+    button:active { transform: translateY(1px); }
+    button:disabled { opacity: .7; cursor: progress; }
+    .spinner {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,.4); border-top-color: #fff;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status { border-radius: var(--radius); padding: 12px 14px; font-size: 14px; font-weight: 500; }
+    .status.success { background: color-mix(in srgb, var(--success) 14%, transparent); color: var(--success); }
+    .status.error   { background: color-mix(in srgb, var(--error) 14%, transparent); color: var(--error); }
+
+    .thanks { text-align: center; padding: 30px 0 10px; }
+    .thanks .icon { font-size: 48px; }
+    .thanks h2 { margin: 10px 0 6px; }
+    .thanks p { color: var(--muted); margin: 0 0 20px; }
+
+    .signin { display: grid; gap: 16px; justify-items: start; }
+    .signin p { margin: 0; color: var(--muted); }
+    .btn {
+      display: inline-block; text-decoration: none; font-weight: 600; color: #fff;
+      background: var(--primary); border-radius: var(--radius); padding: 14px 22px;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .loading { color: var(--muted); }
+
+    .user-bar {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+      padding: 12px 14px; border-radius: var(--radius);
+      background: var(--primary-soft); font-size: 14px; overflow-wrap: anywhere;
+    }
+    .user-label { font-size: 12px; color: var(--muted); }
+    .link-btn {
+      background: none; color: var(--primary); padding: 4px 0; font-size: 13px; font-weight: 600;
+    }
+    .link-btn:hover { background: none; text-decoration: underline; }
+
+    @media (max-width: 560px) {
+      body { padding: 16px 12px; }
+      .card { padding: 26px 18px; border-radius: 16px; }
+      .row { grid-template-columns: 1fr; }
+      .rating-row { grid-template-columns: 1fr; gap: 6px; }
+      h1 { font-size: 25px; }
+      .stars label { font-size: 38px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <header>
+      <span class="badge">Employee IT Survey</span>
+      <h1>IT Team Feedback</h1>
+      <p>Help us make IT work better for you. Tell us how your computers, internet and apps are
+         working today, and what you'd like us to change or add.</p>
+      <p class="meta">⏱ Takes about 3 minutes · Please fill in the questions marked *</p>
+    </header>
+
+    <form id="feedbackForm" novalidate>
+      <!-- About you -->
+      <section class="section" style="border-top:none;padding-top:0">
+        <h2><span class="num">1</span>About you</h2>
+
+        <div class="field" id="emailField">
+          <label for="email">Email<span class="req">*</span></label>
+          <input type="email" id="email" name="email" maxlength="100" autocomplete="email"
+            placeholder="e.g. name@company.com" />
+          <span class="error-msg"></span>
+        </div>
+
+        <div class="field" id="empField">
+          <label for="employee_id">Employee ID<span class="req">*</span></label>
+          <input type="text" id="employee_id" name="employee_id" maxlength="50" autocomplete="off"
+            placeholder="e.g. ITWITPL0241" />
+          <span class="error-msg"></span>
+          <span class="ok-msg" id="empOk"></span>
+        </div>
+
+        <div class="field" id="brandField">
+          <label for="brand">Brand<span class="req">*</span></label>
+          <div class="combo">
+              <input type="text" id="brand" name="brand" autocomplete="off"
+            placeholder="Type to search, then select" role="combobox" aria-expanded="false" aria-controls="brandList" />
+              <ul class="combo-list" id="brandList" role="listbox" hidden></ul>
+            </div>
+          <span class="error-msg"></span>
+        </div>
+
+        <fieldset class="field" id="locationField">
+          <legend>Where do you work?<span class="req">*</span></legend>
+          <div class="chips" id="locationChips"></div>
+          <span class="error-msg"></span>
+        </fieldset>
+
+        <div class="row">
+          <div class="field" id="branchField">
+            <label for="branch">Store / branch name<span class="req">*</span></label>
+            <div class="combo">
+              <input type="text" id="branch" name="branch" autocomplete="off"
+              placeholder="Type to search, then select" role="combobox" aria-expanded="false" aria-controls="branchList" />
+              <ul class="combo-list" id="branchList" role="listbox" hidden></ul>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+          <div class="field" id="roleField">
+            <label for="role">Your role<span class="req">*</span></label>
+            <div class="combo">
+              <input type="text" id="role" name="role" autocomplete="off"
+              placeholder="Type to search, then select" role="combobox" aria-expanded="false" aria-controls="roleList" />
+              <ul class="combo-list" id="roleList" role="listbox" hidden></ul>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Current IT setup -->
+      <section class="section">
+        <h2><span class="num">2</span>Your current IT setup</h2>
+
+        <fieldset class="field" id="overallField">
+          <legend>Overall, how well is IT working for you?<span class="req">*</span></legend>
+          <div class="stars" id="overallStars"></div>
+          <span class="error-msg"></span>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>Rate each part <span class="opt">(optional)</span></legend>
+          <div class="ratings" id="setupRatings"></div>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>What problems do you face often? <span class="opt">(tick all that apply)</span></legend>
+          <div class="chips" id="problemChips"></div>
+        </fieldset>
+      </section>
+
+      <!-- Applications -->
+      <section class="section">
+        <h2><span class="num">3</span>Applications you use</h2>
+        <p class="hint">Rate the apps you use at work. Choose "Don't use" for the ones you don't.</p>
+
+        <div class="ratings" id="appRatings"></div>
+
+        <div class="field">
+          <label for="appProblems">Which app gives you the most trouble, and why? <span class="opt">(optional)</span></label>
+          <textarea id="appProblems" name="app_problems" maxlength="2000"
+            placeholder="e.g. SimplicITi freezes during billing rush hours, stock shows wrong quantity, reports take too long…"></textarea>
+          <div class="counter"><span data-count-for="appProblems">0</span>/2000</div>
+        </div>
+      </section>
+
+      <!-- Changes & features -->
+      <section class="section">
+        <h2><span class="num">4</span>Changes &amp; new features</h2>
+
+        <fieldset class="field">
+          <legend>What changes would help you most? <span class="opt">(tick all that apply)</span></legend>
+          <div class="chips" id="changeChips"></div>
+        </fieldset>
+
+        <div class="field">
+          <label for="features">What features or tools should we add? <span class="opt">(optional)</span></label>
+          <textarea id="features" name="features" maxlength="2000"
+            placeholder="e.g. Check stock of other stores from my phone, quick product lookup, faster billing…"></textarea>
+          <div class="counter"><span data-count-for="features">0</span>/2000</div>
+        </div>
+
+        <div class="field">
+          <label for="comments">Anything else you'd like to tell the IT team? <span class="opt">(optional)</span></label>
+          <textarea id="comments" name="comments" maxlength="2000" placeholder="Any other ideas, complaints or compliments…"></textarea>
+          <div class="counter"><span data-count-for="comments">0</span>/2000</div>
+        </div>
+      </section>
+
+      <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+
+      <button type="submit" id="submitBtn">Submit Feedback</button>
+    </form>
+
+    <div class="thanks" id="thanks" hidden>
+      <div class="icon">🎉</div>
+      <h2>Thank you!</h2>
+      <p>Your feedback has been sent to the IT team. It helps us decide what to improve next.</p>
+      <button type="button" id="againBtn">Submit another response</button>
+    </div>
+  </main>
+
+  <script type="module">
+    import { BRANDS, LOCATIONS, SETUP_ITEMS, PROBLEMS, APPS, CHANGES, RATINGS, NOT_USED } from "./form-config.js";
+
+    const API_URL = "/api/feedback";
+    const $ = id => document.getElementById(id);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    // ---------- Build the form from form-config.js ----------
+    const chips = (name, items, type = "checkbox") => items.map(v =>
+      `<label class="chip"><input type="${type}" name="${name}" value="${esc(v)}" /><span>${esc(v)}</span></label>`).join("");
+
+    $("locationChips").innerHTML = chips("location", LOCATIONS, "radio");
+    $("problemChips").innerHTML = chips("problems", PROBLEMS);
+    $("changeChips").innerHTML = chips("changes", CHANGES);
+
+    const ratingOptions = extra => `<option value="">Not rated</option>` + extra +
+      RATINGS.map(([n, t]) => `<option value="${n}">${n} – ${t}</option>`).join("");
+    const ratingRows = (prefix, items, extra = "") => items.map(i => `
+      <div class="rating-row">
+        <label for="${prefix}_${i.key}">${esc(i.label)}</label>
+        <select id="${prefix}_${i.key}" name="${prefix}_${i.key}">${ratingOptions(extra)}</select>
+      </div>`).join("");
+
+    $("setupRatings").innerHTML = ratingRows("setup", SETUP_ITEMS);
+    $("appRatings").innerHTML = ratingRows("app", APPS, `<option value="${esc(NOT_USED)}">${esc(NOT_USED)}</option>`);
+
+    // Overall star rating
+    const starText = { 0: "", ...Object.fromEntries(RATINGS) };
+    $("overallStars").innerHTML = [1, 2, 3, 4, 5].map(n => `
+      <input type="radio" id="star${n}" name="overall" value="${n}" />
+      <label for="star${n}" title="${starText[n]}" aria-label="${n} star${n > 1 ? "s" : ""} – ${starText[n]}">★</label>`).join("")
+      + `<span class="star-text" id="starText"></span>`;
+
+    const starLabels = [...$("overallStars").querySelectorAll("label")];
+    const paintStars = n => {
+      starLabels.forEach((l, i) => l.classList.toggle("on", i < n));
+      $("starText").textContent = starText[n] || "";
+    };
+    const currentStars = () => Number(new FormData($("feedbackForm")).get("overall") || 0);
+    starLabels.forEach((l, i) => {
+      l.addEventListener("mouseenter", () => paintStars(i + 1));
+      l.addEventListener("mouseleave", () => paintStars(currentStars()));
+    });
+    $("overallStars").addEventListener("change", () => { paintStars(currentStars()); validate("overall"); });
+    $("locationChips").addEventListener("change", () => validate("location"));
+
+    // Character counters
+    document.querySelectorAll("[data-count-for]").forEach(counter => {
+      const ta = $(counter.dataset.countFor);
+      ta.addEventListener("input", () => { counter.textContent = ta.value.length; });
+    });
+
+    // ---------- Validation ----------
+    const form = $("feedbackForm");
+
+    // ---------- Master lists (brand / store / role) ----------
+    const lists = { brand: [], branch: [], role: [] };
+    // Searchable dropdown: opens on click, filters as you type, keyboard friendly
+    const combos = {};
+    let emailDomain = "it-world.in";
+    let masterState = "loading";            // loading | ready | failed
+    const emptyText = () => masterState === "loading" ? "Loading…"
+      : masterState === "failed" ? "Could not load the list. Click here to retry." : "No match found";
+    function makeCombo(key) {
+      const input = $(key), list = $(key + "List");
+      let items = [], shown = [], active = -1;
+
+      const close = () => { list.hidden = true; input.setAttribute("aria-expanded", "false"); active = -1; };
+      const choose = i => {
+        input.value = shown[i].value; close();
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      };
+      const highlight = n => {
+        active = n;
+        [...list.children].forEach((li, i) => li.classList.toggle("active", i === n));
+        list.children[n]?.scrollIntoView({ block: "nearest" });
+      };
+      const render = () => {
+        const q = input.value.trim().toLowerCase();
+        const exact = items.some(i => i.value.toLowerCase() === q);
+        shown = (!q || exact ? items : items.filter(i =>
+          i.value.toLowerCase().includes(q) || i.sub.toLowerCase().includes(q))).slice(0, 300);
+        list.innerHTML = shown.length
+          ? shown.map((i, n) => '<li role="option" data-i="' + n + '">' + esc(i.value) +
+              (i.sub ? '<span class="sub">' + esc(i.sub) + '</span>' : '') + '</li>').join("")
+          : '<li class="empty" data-retry>' + emptyText() + '</li>';
+        list.hidden = false; input.setAttribute("aria-expanded", "true");
+        highlight(shown.length && q && !exact ? 0 : -1);
+      };
+
+      input.addEventListener("focus", render);
+      input.addEventListener("click", () => { if (list.hidden) render(); });
+      input.addEventListener("input", render);
+      input.addEventListener("blur", close);
+      list.addEventListener("mousedown", e => {      // mousedown keeps the input focused
+        e.preventDefault();
+        const li = e.target.closest("li[data-i]");
+        if (li) choose(Number(li.dataset.i));
+        else if (e.target.closest("li[data-retry]") && masterState === "failed") { loadMaster(); render(); }
+      });
+      input.addEventListener("keydown", e => {
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          e.preventDefault();
+          if (list.hidden) render();
+          if (shown.length) highlight((active + (e.key === "ArrowDown" ? 1 : -1) + shown.length) % shown.length);
+        } else if (e.key === "Enter" && !list.hidden && active >= 0) {
+          e.preventDefault(); choose(active);
+        } else if (e.key === "Escape") close();
+      });
+
+      combos[key] = { setItems: v => { items = v; lists[key] = v.map(i => i.value); } };
+    }
+    for (const key of ["brand", "branch", "role"]) makeCombo(key);
+    combos.brand.setItems(BRANDS.map(b => ({ value: b, sub: "" })));
+
+    const canon = (key, value) => lists[key].find(v => v.toLowerCase() === value.trim().toLowerCase()) ?? null;
+
+    async function loadMaster() {
+      masterState = "loading";
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        const res = await fetch("/api/master").catch(() => null);
+        const data = res && res.ok ? await res.json().catch(() => null) : null;
+        if (data?.ok) {
+          combos.branch.setItems(data.stores.map(s => ({ value: s.name, sub: s.city })));
+          if (data.emailDomain) emailDomain = data.emailDomain;
+          combos.role.setItems(data.roles.map(r => ({ value: r, sub: "" })));
+          masterState = "ready";
+          return;
+        }
+        await new Promise(r => setTimeout(r, 1500 * attempt));
+      }
+      masterState = "failed";
+      showStatus("error", "Could not load the store and role lists. Click the Store or Role box to retry, or refresh the page.");
+    }
+
+    loadMaster();
+
+    // ---------- Employee ID check (exists? already submitted?) ----------
+    let emp = { id: "", status: "" };   // status: "", ok, notfound, duplicate
+    async function checkEmployee() {
+      const id = $("employee_id").value.trim();
+      $("empOk").textContent = "";
+      if (!id) { emp = { id: "", status: "" }; return; }
+      const res = await fetch("/api/employee?id=" + encodeURIComponent(id)).catch(() => null);
+      const data = res && res.ok ? await res.json().catch(() => null) : null;
+      if (!data?.ok) { emp = { id: "", status: "" }; return; }   // server re-checks on submit
+      emp = { id: id.toUpperCase(), status: !data.found ? "notfound" : data.duplicate ? "duplicate" : "ok" };
+      if (emp.status === "ok") {
+        $("empOk").textContent = "✓ " + data.name;
+        if (!$("role").value && data.role && canon("role", data.role)) { $("role").value = data.role; validate("role"); }
+      }
+      validate("employee_id");
+    }
+    $("employee_id").addEventListener("blur", checkEmployee);
+    $("employee_id").addEventListener("input", () => { emp = { id: "", status: "" }; $("empOk").textContent = ""; });
+
+    const listRule = (key, label) => ({
+      el: () => $(key),
+      check: () => !$(key).value.trim() ? `Please choose your ${label}.`
+        : canon(key, $(key).value) ? "" : `Please choose your ${label} from the list.`
+    });
+    $("email").addEventListener("blur", () => validate("email"));
+    $("employee_id").addEventListener("blur", () => { if ($("email").value.trim()) validate("email"); });
+    for (const key of ["brand", "branch", "role"]) {
+      $(key).addEventListener("change", () => { const c = canon(key, $(key).value); if (c) $(key).value = c; validate(key); });
+    }
+
+    const rules = {
+      email: { el: () => $("email"), check: () => {
+        const v = $("email").value.trim();
+        if (!v) return "Please enter your email address.";
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return "Please enter a valid email address.";
+        return "";
+      } },
+      employee_id: { el: () => $("employee_id"), check: () => {
+        const v = $("employee_id").value.trim().toUpperCase();
+        if (!v) return "Please enter your Employee ID.";
+        if (emp.id === v && emp.status === "notfound") return "Employee ID not found. Please check it and try again.";
+        if (emp.id === v && emp.status === "duplicate") return "Feedback has already been submitted for this Employee ID.";
+        return "";
+      } },
+      brand: listRule("brand", "brand"),
+      branch: listRule("branch", "store / branch"),
+      role: listRule("role", "role"),
+      location: { el: () => $("locationField"), check: () =>
+        new FormData(form).get("location") ? "" : "Please choose where you work." },
+      overall: { el: () => $("overallField"), check: () =>
+        currentStars() ? "" : "Please tap a star to rate." }
+    };
+
+    function validate(key) {
+      const { el, check } = rules[key];
+      const field = el().closest(".field");
+      const msg = check();
+      field.classList.toggle("invalid", !!msg);
+      field.querySelector(".error-msg").textContent = msg;
+      return !msg;
+    }
+
+    // ---------- Submit ----------
+    const statusEl = $("status");
+    const submitBtn = $("submitBtn");
+    const showStatus = (type, text) => { statusEl.className = "status " + type; statusEl.textContent = text; statusEl.hidden = false; };
+    const setLoading = on => {
+      submitBtn.disabled = on;
+      submitBtn.innerHTML = on ? '<span class="spinner"></span> Submitting…' : "Submit Feedback";
+    };
+
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      statusEl.hidden = true;
+
+      const ok = Object.keys(rules).map(validate).every(Boolean);
+      if (!ok) {
+        form.querySelector(".field.invalid")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        showStatus("error", "Please fill in the highlighted questions.");
+        return;
+      }
+
+      const fd = new FormData(form);
+      const text = k => (fd.get(k) || "").trim();
+      const payload = {
+        email: text("email"),
+        employee_id: text("employee_id"),
+        brand: canon("brand", text("brand")) ?? text("brand"),
+        location: fd.get("location"),
+        branch: canon("branch", text("branch")) ?? text("branch"),
+        role: canon("role", text("role")) ?? text("role"),
+        overall: fd.get("overall"),
+        setup: Object.fromEntries(SETUP_ITEMS.map(i => [i.key, fd.get("setup_" + i.key) || ""])),
+        problems: fd.getAll("problems"),
+        apps: Object.fromEntries(APPS.map(a => [a.key, fd.get("app_" + a.key) || ""])),
+        app_problems: text("app_problems"),
+        changes: fd.getAll("changes"),
+        features: text("features"),
+        comments: text("comments")
+      };
+
+      setLoading(true);
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.ok) {
+          form.reset();
+          paintStars(0);
+          document.querySelectorAll("[data-count-for]").forEach(c => (c.textContent = "0"));
+          form.hidden = true;
+          $("thanks").hidden = false;
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else if (res.status === 400 && data.errors) {
+          showStatus("error", Object.values(data.errors).join(" "));
+          if (data.errors.employee_id) { emp = { id: text("employee_id").toUpperCase(), status: /already/.test(data.errors.employee_id) ? "duplicate" : "notfound" }; validate("employee_id"); }
+        } else {
+          showStatus("error", data.message || "Could not save your feedback. Please try again.");
+        }
+      } catch (err) {
+        console.error(err);
+        showStatus("error", "Couldn't reach the server. Please check your connection and try again.");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    $("againBtn").addEventListener("click", () => {
+      $("thanks").hidden = true;
+      form.hidden = false;
+      statusEl.hidden = true;
+    });
+  </script>
+</body>
+</html>
