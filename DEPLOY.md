@@ -27,7 +27,8 @@ Edit `.env`:
 | `PORT` | e.g. `3000` |
 | `SESSION_SECRET` | new random string (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`) |
 | `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_REFRESH_TOKEN` | from the owner |
-| `ZOHO_SHEET_RESOURCE_ID`, `ZOHO_WORKSHEET_NAME` | from the owner |
+| `ZOHO_SHEET_RESOURCE_ID` | from the owner |
+| `ZOHO_WORKSHEET_NAME` | `Responses` (must match the tab name exactly; the sheet also needs `Employees` and `Stores` tabs) |
 | `ZOHO_LOGIN_CLIENT_ID`, `ZOHO_LOGIN_CLIENT_SECRET` | from the owner |
 | `ALLOWED_EMAIL_DOMAINS` | optional, e.g. `it-world.in` |
 

@@ -210,6 +210,26 @@
     .thanks h2 { margin: 10px 0 6px; }
     .thanks p { color: var(--muted); margin: 0 0 20px; }
 
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px;
+      background: rgba(10, 14, 30, .55); backdrop-filter: blur(3px);
+      animation: fadeIn .2s ease;
+    }
+    .modal-backdrop[hidden] { display: none; }
+    .modal {
+      background: var(--card); color: var(--text); border: 1px solid var(--border);
+      border-radius: 16px; box-shadow: var(--shadow); width: min(420px, 100%);
+      padding: 32px 28px 26px; text-align: center; animation: popIn .25s ease;
+    }
+    .modal .check {
+      width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 50%;
+      display: grid; place-items: center; font-size: 34px; color: #fff; background: var(--success);
+    }
+    .modal h2 { margin: 0 0 8px; }
+    .modal p { margin: 0 0 22px; color: var(--muted); }
+    @keyframes fadeIn { from { opacity: 0; } }
+    @keyframes popIn { from { opacity: 0; transform: scale(.92) translateY(8px); } }
+
     .signin { display: grid; gap: 16px; justify-items: start; }
     .signin p { margin: 0; color: var(--muted); }
     .btn {
@@ -377,6 +397,15 @@
       <h2>Thank you!</h2>
       <p>Your feedback has been sent to the IT team. It helps us decide what to improve next.</p>
       <button type="button" id="againBtn">Submit another response</button>
+    </div>
+
+    <div class="modal-backdrop" id="thanksModal" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="thanksTitle">
+        <div class="check" aria-hidden="true">✓</div>
+        <h2 id="thanksTitle">Thanks for submitting!</h2>
+        <p>Your feedback has been sent to the IT team.</p>
+        <button type="button" id="modalOk">OK</button>
+      </div>
     </div>
   </main>
 
@@ -633,6 +662,8 @@
           form.hidden = true;
           $("thanks").hidden = false;
           window.scrollTo({ top: 0, behavior: "smooth" });
+          $("thanksModal").hidden = false;
+          $("modalOk").focus();
         } else if (res.status === 400 && data.errors) {
           showStatus("error", Object.values(data.errors).join(" "));
           if (data.errors.employee_id) { emp = { id: text("employee_id").toUpperCase(), status: /already/.test(data.errors.employee_id) ? "duplicate" : "notfound" }; validate("employee_id"); }
@@ -646,6 +677,11 @@
         setLoading(false);
       }
     });
+
+    const closeModal = () => { $("thanksModal").hidden = true; };
+    $("modalOk").addEventListener("click", closeModal);
+    $("thanksModal").addEventListener("click", e => { if (e.target.id === "thanksModal") closeModal(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
 
     $("againBtn").addEventListener("click", () => {
       $("thanks").hidden = true;
